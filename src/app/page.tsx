@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthIllustration } from "@/components/auth-illustration";
 import { Brand } from "@/components/brand";
+import { DemoButton } from "@/components/demo-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/session";
@@ -36,9 +37,7 @@ export default async function HomePage() {
             <Button variant="ghost" size="sm" render={<Link href="/sign-in" />}>
               Sign in
             </Button>
-            <Button size="sm" render={<Link href="/sign-up" />}>
-              Create account
-            </Button>
+            <DemoButton label="Try the demo" variant="default" size="sm" fullWidth={false} />
           </div>
         )}
       </header>
@@ -60,9 +59,7 @@ export default async function HomePage() {
               </Button>
             ) : (
               <>
-                <Button size="lg" render={<Link href="/sign-up" />}>
-                  Create account
-                </Button>
+                <DemoButton label="Try the demo" variant="default" fullWidth={false} />
                 <Button variant="secondary" size="lg" render={<Link href="/sign-in" />}>
                   Sign in
                 </Button>

@@ -379,7 +379,7 @@ export default function DesignPage() {
               <Button size="sm" variant="ghost">Dismiss</Button>
               <Button size="sm" variant="destructive"><RotateCcwIcon /> Retry</Button>
               <Button>Upload recording <ArrowUpIcon /></Button>
-              <Button size="lg">Create account</Button>
+              <Button size="lg">Try the demo</Button>
               <Button size="lg" variant="secondary">Sign in</Button>
               <Button size="icon" variant="secondary" aria-label="Upload"><ArrowUpIcon /></Button>
             </div>

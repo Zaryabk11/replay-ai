@@ -1,5 +1,6 @@
 import { APIError } from "better-auth/api";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DEMO_UNAVAILABLE_MESSAGE } from "@/lib/demo-account";
 
 const signInEmail = vi.fn();
 const signUpEmail = vi.fn();
@@ -22,7 +23,7 @@ vi.mock("@/lib/auth", () => ({
   },
 }));
 
-const { signIn, signUp, signOut } = await import("./actions");
+const { signIn, signUp, signInAsDemo, signOut } = await import("./actions");
 
 /** The real error class, so isAPIError() recognises it as Better Auth would. */
 function apiError(message: string) {
@@ -141,6 +142,70 @@ describe("signUp", () => {
     });
 
     expect(!result.ok && result.message).toBe("User already exists");
+  });
+});
+
+describe("signInAsDemo", () => {
+  it("reads the credentials from the server environment", async () => {
+    vi.stubEnv("DEMO_EMAIL", "demo@recap.app");
+    vi.stubEnv("DEMO_PASSWORD", "demo-password-1");
+
+    const result = await signInAsDemo();
+
+    expect(result).toEqual({ ok: true });
+    expect(signInEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: { email: "demo@recap.app", password: "demo-password-1" },
+      })
+    );
+  });
+
+  // The whole point of the action: the browser sends nothing and learns nothing.
+  it("takes no arguments, so a caller cannot choose the account", () => {
+    expect(signInAsDemo.length).toBe(0);
+  });
+
+  it("ignores anything a caller passes anyway", async () => {
+    vi.stubEnv("DEMO_EMAIL", "demo@recap.app");
+    vi.stubEnv("DEMO_PASSWORD", "demo-password-1");
+
+    await (signInAsDemo as unknown as (x: unknown) => Promise<unknown>)({
+      email: "admin@company.com",
+      password: "hunter2",
+    });
+
+    expect(signInEmail.mock.calls[0][0].body.email).toBe("demo@recap.app");
+  });
+
+  it("reports the demo as unavailable when it is unconfigured", async () => {
+    vi.stubEnv("DEMO_EMAIL", "");
+    vi.stubEnv("DEMO_PASSWORD", "");
+
+    const result = await signInAsDemo();
+
+    expect(result).toEqual({ ok: false, message: DEMO_UNAVAILABLE_MESSAGE, field: undefined });
+    expect(signInEmail).not.toHaveBeenCalled();
+  });
+
+  it("keeps the env var names out of the visitor-facing message", async () => {
+    vi.stubEnv("DEMO_EMAIL", "");
+    vi.stubEnv("DEMO_PASSWORD", "");
+
+    const result = await signInAsDemo();
+
+    expect(!result.ok && result.message).not.toMatch(/DEMO_EMAIL|DEMO_PASSWORD/);
+  });
+
+  // The usual cause is that `npm run seed:demo` has not been run.
+  it("explains a sign-in failure without naming the account", async () => {
+    vi.stubEnv("DEMO_EMAIL", "demo@recap.app");
+    vi.stubEnv("DEMO_PASSWORD", "demo-password-1");
+    signInEmail.mockRejectedValue(apiError("Invalid email or password"));
+
+    const result = await signInAsDemo();
+
+    expect(!result.ok && result.message).toBe("The demo account isn't ready yet. Try again in a moment.");
+    expect(!result.ok && result.message).not.toContain("demo@recap.app");
   });
 });
 

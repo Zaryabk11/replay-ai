@@ -1,15 +1,14 @@
 /**
- * The shared demo account.
+ * The shared demo account behind "Try the demo".
  *
- * There is deliberately no way to sign into it from the UI — the "Try the
- * demo" button and its server action were removed. What remains is the
- * account itself, created by `npm run seed:demo`, so the flow can be brought
- * back without rebuilding it: `isDemoEmail` still gives that account the
- * tighter upload budget, and the seed scripts still resolve its credentials.
+ * The account is a real user row like any other — Better Auth verifies its
+ * password against the database, so `npm run seed:demo` must have run against
+ * whichever database the app is pointed at before the button can work.
  *
- * This module is pure: it reads nothing from `process.env` on its own and
- * holds no literal credentials. Callers pass an env record in, which keeps it
- * testable and keeps the secrets in server-side callers only.
+ * This module is deliberately pure: it reads nothing from `process.env` on its
+ * own and holds no literal credentials. Callers pass an env record in, which
+ * keeps it testable and keeps the secrets in exactly two server-side places —
+ * the `"use server"` action and the seed script.
  *
  * Never import this from a client component. The credentials are plain
  * `DEMO_*` vars, so Next will not inline them into the browser bundle, but a
@@ -30,6 +29,10 @@ export type DemoCredentialsResult =
 
 /** The name the seeded demo account is created with. */
 export const DEMO_USER_NAME = "Demo User";
+
+/** Message surfaced to the visitor when the demo is not configured. */
+export const DEMO_UNAVAILABLE_MESSAGE =
+  "The demo account isn't set up yet. Sign in with your own account instead.";
 
 type EnvLike = Partial<Record<string, string>>;
 
@@ -87,42 +90,12 @@ export function isDemoEmail(email: string | null | undefined, env: EnvLike): boo
 // ---------------------------------------------------------------------------
 
 /**
- * Stand-ins so the library's ready / processing / failed rows are visible
- * before the pipeline exists. Every title carries the PLACEHOLDER_PREFIX, and
- * the seed script replaces them wholesale on each run.
+ * Marks a meeting that was seeded rather than produced by the pipeline, so
+ * the library can say so. The demo library (prisma/demo-content.ts) uses real
+ * titles on purpose; this is for the stress-test seed, whose rows have no
+ * business being mistaken for real output.
  */
 export const PLACEHOLDER_PREFIX = "[Placeholder]";
-
-export type MeetingStatusName = "UPLOADED" | "TRANSCRIBING" | "SUMMARIZING" | "VALIDATING" | "READY" | "FAILED";
-
-export type DemoMeetingSeed = {
-  title: string;
-  status: MeetingStatusName;
-  durationSec: number | null;
-  /** Days before the seed run, so the library always shows recent dates. */
-  daysAgo: number;
-};
-
-export const demoMeetingSeeds: readonly DemoMeetingSeed[] = [
-  {
-    title: `${PLACEHOLDER_PREFIX} Product Weekly Sync`,
-    status: "READY",
-    durationSec: 2538, // 42:18
-    daysAgo: 1,
-  },
-  {
-    title: `${PLACEHOLDER_PREFIX} Q2 Roadmap Review`,
-    status: "TRANSCRIBING",
-    durationSec: 3767, // 1:02:47
-    daysAgo: 2,
-  },
-  {
-    title: `${PLACEHOLDER_PREFIX} Sales & Product Alignment`,
-    status: "FAILED",
-    durationSec: 3251, // 54:11
-    daysAgo: 5,
-  },
-] as const;
 
 export function isPlaceholderMeeting(title: string): boolean {
   return title.startsWith(PLACEHOLDER_PREFIX);

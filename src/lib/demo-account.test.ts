@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   DEMO_USER_NAME,
   PLACEHOLDER_PREFIX,
-  demoMeetingSeeds,
   isDemoEmail,
   isPlaceholderMeeting,
   resolveDemoCredentials,
@@ -83,19 +82,14 @@ describe("isDemoEmail", () => {
   });
 });
 
-describe("demoMeetingSeeds", () => {
-  it("covers the three states the library needs to show", () => {
-    expect(demoMeetingSeeds.map((m) => m.status)).toEqual(["READY", "TRANSCRIBING", "FAILED"]);
+describe("isPlaceholderMeeting", () => {
+  it("flags a seeded stress-test title", () => {
+    expect(isPlaceholderMeeting(`${PLACEHOLDER_PREFIX} Product Weekly Sync`)).toBe(true);
   });
 
-  it("marks every seeded meeting as a placeholder", () => {
-    for (const seed of demoMeetingSeeds) {
-      expect(seed.title.startsWith(PLACEHOLDER_PREFIX)).toBe(true);
-      expect(isPlaceholderMeeting(seed.title)).toBe(true);
-    }
-  });
-
+  // The demo library uses real titles, so it must not be flagged.
   it("does not flag a real meeting title", () => {
     expect(isPlaceholderMeeting("Product Weekly Sync")).toBe(false);
+    expect(isPlaceholderMeeting("")).toBe(false);
   });
 });

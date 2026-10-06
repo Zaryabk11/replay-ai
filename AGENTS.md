@@ -102,10 +102,16 @@ decision. Do not invent colors, radii, shadows, or type sizes beyond it.
   not thrown errors, so forms can render a message.
 - Secrets stay server-side. Only `NEXT_PUBLIC_*` reaches the browser; the demo
   credentials in particular must never be imported into a client component.
-- There is **no demo sign-in**. The seeded demo account still exists (see
-  `seed:demo`) and still gets the tighter upload budget via `isDemoEmail`, but
-  the "Try the demo" button and its server action were removed — do not add a
-  UI path into that account without being asked.
+- The "Try the demo" button signs into a real seeded account via
+  `signInAsDemo()`; the credentials never leave the server. It only works
+  where `npm run seed:demo` has been run against that database — the demo
+  user is an ordinary row, not a bypass.
+- The demo library lives in `prisma/demo-content.ts`: whole meetings with
+  transcripts, summaries, citations and triaged actions, plus one
+  transcribing and one failed so those states are reachable. Citations are
+  written as a snippet of the line they come from and resolved at seed time,
+  so a citation cannot drift onto the wrong line when the dialogue is edited.
+  `seed:demo` replaces every meeting that account owns on each run.
 
 ## Commands
 
@@ -117,7 +123,7 @@ decision. Do not invent colors, radii, shadows, or type sizes beyond it.
 | `npm run lint`        | eslint                                            |
 | `npm run db:migrate`  | Prisma migration against Neon (uses `DIRECT_URL`) |
 | `npm run db:generate` | Regenerate the client — Prisma 7 does not do this on migrate |
-| `npm run seed:demo`   | Create/update the demo account + placeholder meetings (no UI signs into it) |
+| `npm run seed:demo`   | Create/update the demo account and fill its library with demo meetings |
 | `npm run seed:sample` | One READY meeting with a fake transcript, for the meeting page (pass a segment count, e.g. `npm run seed:sample 4000`) |
 | `npx inngest-cli@latest dev` | Inngest dev server (run beside `npm run dev`)   |
 

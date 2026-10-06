@@ -3,6 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Brand } from "@/components/brand";
 import { getSession } from "@/lib/session";
+import { DemoButton } from "@/components/demo-button";
+import { Divider } from "../_components/divider";
 import { SignInForm } from "../_components/sign-in-form";
 
 export const metadata: Metadata = {
@@ -22,7 +24,11 @@ export default async function SignInPage() {
         <p className="mt-1.5 text-base text-slate">Review your cited meetings.</p>
       </div>
 
-      <SignInForm />
+      <div className="flex flex-col gap-3.5">
+        <SignInForm />
+        <Divider>or</Divider>
+        <DemoButton />
+      </div>
 
       <p className="text-sm text-slate">
         No account?{" "}
