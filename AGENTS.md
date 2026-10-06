@@ -125,6 +125,7 @@ decision. Do not invent colors, radii, shadows, or type sizes beyond it.
 | `npm run db:generate` | Regenerate the client — Prisma 7 does not do this on migrate |
 | `npm run seed:demo`   | Create/update the demo account and fill its library with demo meetings |
 | `npm run seed:sample` | One READY meeting with a fake transcript, for the meeting page (pass a segment count, e.g. `npm run seed:sample 4000`) |
+| `npm run seed:demo-recording` | Upload a real local audio file into the demo account and run it through the real pipeline (`-- <path> ["Title"]`) |
 | `npx inngest-cli@latest dev` | Inngest dev server (run beside `npm run dev`)   |
 
 Environment lives in `.env.local` (gitignored). `.env.example` lists every

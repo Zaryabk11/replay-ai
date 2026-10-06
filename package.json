@@ -13,7 +13,8 @@
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
     "seed:demo": "tsx --env-file-if-exists=.env.local prisma/seed-demo.ts",
-    "seed:sample": "tsx --env-file-if-exists=.env.local prisma/seed-sample-meeting.ts"
+    "seed:sample": "tsx --env-file-if-exists=.env.local prisma/seed-sample-meeting.ts",
+    "seed:demo-recording": "tsx --env-file-if-exists=.env.local prisma/seed-demo-recording.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
