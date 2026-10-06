@@ -8,7 +8,7 @@ import {
 } from "./types";
 
 /**
- * Summaries from Gemini 2.5 Flash, constrained to JSON by `responseSchema`.
+ * Summaries from Gemini 3.8 Flash, constrained to JSON by `responseSchema`.
  *
  * Reached over fetch: one endpoint, and the schema below has to be hand-built
  * for Gemini's dialect anyway, so the SDK would not save anything.
@@ -22,7 +22,7 @@ import {
  * case) still takes exactly one call, unchanged from before.
  */
 
-const MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+const MODEL = process.env.GEMINI_MODEL ?? "gemini-3.8-flash";
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
 /** Final caps on the merged summary — a product decision, not a technical one. */
@@ -426,7 +426,7 @@ async function callGemini(prompt: string, caps?: ResultCaps): Promise<DraftSumma
 // ---------------------------------------------------------------------------
 
 export const gemini: SummaryProvider = {
-  name: "gemini-2.5-flash",
+  name: "gemini-3.8-flash",
 
   async summarize({ segments }) {
     if (!process.env.GEMINI_API_KEY) {
