@@ -1,106 +1,251 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 @import "shadcn/tailwind.css";
+
+/*
+ * Recap Design System v2: source is src/design/Recap System v2.dc.html
+ * Every value below is lifted from that file. Where the file leaves something
+ * unspecified, the choice is derived from existing tokens and noted inline.
+ */
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-serif: var(--font-newsreader);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: var(--radius);
-  --radius-md: var(--radius);
-  --radius-lg: var(--radius);
-  --radius-xl: var(--radius);
-  --radius-2xl: var(--radius);
-  --radius-3xl: var(--radius);
-  --radius-4xl: var(--radius);
+@theme {
+  /* ---------- Colour ---------- */
+  /* Drop Tailwind's default palette so only Recap colours exist. */
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
 
-  /* Brand tokens -> utilities like bg-deep-teal, text-ink, border-blue-grey */
-  --color-deep-teal: #2f5d62;
-  --color-harbor-blue: #6c8ca0;
-  --color-ink: #1e2527;
-  --color-slate: #5a676a;
-  --color-blue-grey: #aab8c1;
-  --color-mist-paper: #f3f6f5;
+  /* Core palette: six brand colours */
+  --color-deep-teal-500: #2f5d62; /* primary */
+  --color-harbor-blue-500: #6c8ca0; /* focus ring */
+  --color-ink-900: #1e2527; /* primary text */
+  --color-slate-600: #5a676a; /* secondary text */
+  --color-blue-grey-300: #aab8c1; /* secondary-button border, mute */
+  --color-mist-paper: #f3f6f5; /* surface-subtle, app bg */
+
+  /* Teal states and tints (hover/active from "Interaction states";
+     tints from citation chip, dropzone, selected rows) */
+  --color-deep-teal-600: #244a4e; /* hover */
+  --color-deep-teal-700: #1c3b3f; /* active */
+  --color-deep-teal-50: #f6faf9; /* selected row, dropzone */
+  --color-deep-teal-100: #eaf0ef; /* chip background */
+  --color-deep-teal-200: #cfe0dc; /* chip border, text selection */
+
+  /* Neutrals used throughout the file but not in the six */
+  --color-slate-400: #8695a0; /* tertiary text, metadata, table head */
+  --color-surface-raised: #f8faf9; /* table head, side panels */
+  --color-line-100: #f0f3f2; /* table row divider */
+  --color-line-200: #eaeeed; /* inner dividers, table border */
+  --color-line-300: #e1e7e6; /* card border */
+  --color-line-400: #d4dbda; /* page rules, framed screens */
+  --color-line-500: #cbd5d3; /* input border, radio, pending step */
+  --color-skeleton-base: #eef2f1;
+  --color-skeleton-shine: #e2e8e7;
+
+  /* Signal Coral: high priority, error, destructive ONLY */
+  --color-coral-500: #d2492f;
+
+  /* Semantic: bg / border / text */
+  --color-success-bg: #eaf2ec;
+  --color-success-border: #c2dbc9;
+  --color-success-text: #2e5e3a;
+  --color-success-dot: #7fb08a; /* dot on the ink toast */
+  --color-warning-bg: #fbf3e3;
+  --color-warning-border: #ead4a8;
+  --color-warning-text: #8a6514;
+  --color-error-bg: #fbece9;
+  --color-error-border: #f0c3ba;
+  --color-error-text: #b23a28;
+  --color-error-wash: #fefaf9; /* error panel fill */
+  --color-info-bg: #edf1f4;
+  --color-info-border: #c4d3dc;
+  --color-info-text: #3c5a6b;
+  --color-highlight: #fbf0c9; /* search match <mark> */
+
+  /* Convenience aliases: bg-deep-teal, text-ink, text-slate, ... */
+  --color-deep-teal: var(--color-deep-teal-500);
+  --color-harbor-blue: var(--color-harbor-blue-500);
+  --color-ink: var(--color-ink-900);
+  --color-slate: var(--color-slate-600);
+  --color-blue-grey: var(--color-blue-grey-300);
+  --color-coral: var(--color-coral-500);
+
+  /* ---------- Type ---------- */
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), serif;
+  --font-mono: var(--font-geist-mono), monospace;
+  --font-heading: var(--font-serif);
+
+  --text-2xs: 10.5px;
+  --text-2xs--line-height: 1.4;
+  --text-xs: 12px;
+  --text-xs--line-height: 1.5;
+  --text-sm: 13px;
+  --text-sm--line-height: 1.5;
+  --text-ui: 13.5px; /* button, input */
+  --text-ui--line-height: 1.4;
+  --text-base: 14px;
+  --text-base--line-height: 1.5;
+  --text-lg: 18px;
+  --text-lg--line-height: 1.3;
+  --text-xl: 22px;
+  --text-xl--line-height: 1.25;
+  --text-2xl: 26px;
+  --text-2xl--line-height: 1.2;
+  --text-3xl: 40px;
+  --text-3xl--line-height: 1.05;
+  --text-4xl: 46px;
+  --text-4xl--line-height: 1.05;
+
+  --tracking-tight: -0.01em;
+  --tracking-caps: 0.08em; /* table head, section labels */
+  --tracking-eyebrow: 0.14em; /* mono uppercase eyebrow */
+
+  /* ---------- Radius ---------- */
+  --radius-xs: 4px; /* skeleton bars */
+  --radius-sm: 5px; /* badge, citation chip, inline controls */
+  --radius-md: 6px; /* panels, small buttons */
+  --radius-lg: 7px; /* button, input */
+  --radius-xl: 8px; /* cards, toast, large button */
+  --radius-2xl: 10px; /* framed screens, dropzone */
+  --radius-3xl: 12px; /* dialog */
+
+  /* ---------- Spacing ---------- */
+  /* The file sets padding in raw px and defines no scale; Tailwind's 4px
+     base (--spacing: 0.25rem) is kept. */
+
+  /* ---------- Shadows ---------- */
+  --shadow-card: 0 1px 3px rgb(17 17 17 / 0.05);
+  --shadow-toast: 0 4px 14px rgb(17 17 17 / 0.14);
+  --shadow-popover: 0 6px 18px rgb(17 17 17 / 0.1);
+  --shadow-dialog: 0 12px 40px rgb(17 17 17 / 0.14);
+
+  /* ---------- Focus rings ---------- */
+  --shadow-focus: 0 0 0 3px rgb(108 140 160 / 0.45); /* buttons, controls */
+  --shadow-focus-input: 0 0 0 3px rgb(108 140 160 / 0.25); /* text inputs */
+  --shadow-focus-error: 0 0 0 3px rgb(210 73 47 / 0.12);
+  --shadow-focus-success: 0 0 0 3px rgb(46 94 58 / 0.1);
+
+  /* ---------- Motion ---------- */
+  --ease-fade-up: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-scale-in: cubic-bezier(0.34, 1.3, 0.64, 1);
+  --ease-layout: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --animate-spin-fast: rc-spin 0.7s linear infinite;
+  --animate-spin-slow: rc-spin 0.9s linear infinite;
+  --animate-shimmer: rc-shimmer 1.3s linear infinite;
+  --animate-fade-up: rc-fade-up 240ms var(--ease-fade-up) both;
+  --animate-scale-in: rc-scale-in 160ms var(--ease-scale-in) both;
+
+  @keyframes rc-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes rc-shimmer {
+    0% {
+      background-position: -400px 0;
+    }
+    100% {
+      background-position: 400px 0;
+    }
+  }
+  @keyframes rc-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes rc-scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 }
 
-/* shadcn semantic tokens, mapped to the brand palette. Light theme only. */
+@theme inline {
+  /* shadcn semantic aliases -> Recap tokens */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+/* shadcn semantic tokens, light theme only */
 :root {
-  --background: #f3f6f5;
-  --foreground: #1e2527;
-  --card: #ffffff;
-  --card-foreground: #1e2527;
-  --popover: #ffffff;
-  --popover-foreground: #1e2527;
-  --primary: #2f5d62;
-  --primary-foreground: #f3f6f5;
-  --secondary: #e4eaea;
-  --secondary-foreground: #1e2527;
-  --muted: #e4eaea;
-  --muted-foreground: #5a676a;
-  --accent: #e4eaea;
-  --accent-foreground: #1e2527;
-  --destructive: #b3412f;
-  --border: #aab8c1;
-  --input: #aab8c1;
-  --ring: #6c8ca0;
-  --chart-1: #2f5d62;
-  --chart-2: #6c8ca0;
-  --chart-3: #aab8c1;
-  --chart-4: #5a676a;
-  --chart-5: #1e2527;
-  --radius: 4px;
-  --sidebar: #f3f6f5;
-  --sidebar-foreground: #1e2527;
-  --sidebar-primary: #2f5d62;
-  --sidebar-primary-foreground: #f3f6f5;
-  --sidebar-accent: #e4eaea;
-  --sidebar-accent-foreground: #1e2527;
-  --sidebar-border: #aab8c1;
-  --sidebar-ring: #6c8ca0;
+  --background: var(--color-mist-paper);
+  --foreground: var(--color-ink-900);
+  --card: var(--color-white);
+  --card-foreground: var(--color-ink-900);
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-ink-900);
+  --primary: var(--color-deep-teal-500);
+  --primary-foreground: var(--color-white);
+  --secondary: var(--color-white);
+  --secondary-foreground: var(--color-deep-teal-500);
+  --muted: var(--color-mist-paper);
+  --muted-foreground: var(--color-slate-600);
+  --accent: var(--color-mist-paper);
+  --accent-foreground: var(--color-ink-900);
+  --destructive: var(--color-coral-500);
+  --border: var(--color-line-300);
+  --input: var(--color-line-500);
+  --ring: var(--color-harbor-blue-500);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  ::selection {
+    background: var(--color-deep-teal-200);
+  }
+  a:not([class]) {
+    color: var(--color-deep-teal-500);
+    text-decoration: none;
+  }
+  a:not([class]):hover {
+    color: var(--color-deep-teal-600);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

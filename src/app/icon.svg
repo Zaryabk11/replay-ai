@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Recap">
+  <rect width="64" height="64" rx="15" fill="#2F5D62"/>
+  <g transform="translate(5 8)">
+    <rect x="9" y="19" width="5" height="12" rx="2.5" fill="#F3F6F5"/>
+    <rect x="18" y="12" width="5" height="26" rx="2.5" fill="#F3F6F5"/>
+    <rect x="27" y="5" width="5" height="40" rx="2.5" fill="#AAB8C1"/>
+    <rect x="36" y="14" width="5" height="22" rx="2.5" fill="#F3F6F5"/>
+    <rect x="45" y="21" width="5" height="8" rx="2.5" fill="#F3F6F5"/>
+  </g>
+</svg>
