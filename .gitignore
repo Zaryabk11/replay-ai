@@ -1,0 +1,5 @@
+node_modules/
+.claude/hooks/.state/
+.env
+.env.local
+.next/
