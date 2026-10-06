@@ -1,4 +1,4 @@
-import { RotateCcwIcon } from "lucide-react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -37,7 +37,18 @@ export function MeetingTable({ meetings }: { meetings: MeetingRow[] }) {
         {meetings.map((meeting) => (
           <TableRow key={meeting.id}>
             <TableCell className="max-w-0">
-              <div className="truncate font-medium text-ink">{meeting.title}</div>
+              {/* A finished meeting opens its recap; anything else opens the
+                  processing view, which is where its state lives. */}
+              <Link
+                href={
+                  meeting.status === "READY"
+                    ? `/meetings/${meeting.id}`
+                    : `/meetings/${meeting.id}/processing`
+                }
+                className="block truncate rounded-sm font-medium text-ink outline-none hover:text-deep-teal-500 focus-visible:shadow-focus"
+              >
+                {meeting.title}
+              </Link>
               {/* The date column is hidden on phones, so it rides along here. */}
               <div className="mt-0.5 truncate text-[11.5px] text-slate-400">
                 <span className="sm:hidden">{formatMeetingDate(meeting.createdAt)}</span>
@@ -56,13 +67,12 @@ export function MeetingTable({ meetings }: { meetings: MeetingRow[] }) {
               <span className="flex items-center gap-2">
                 <MeetingStatusBadge status={meeting.status} />
                 {meeting.status === "FAILED" && (
-                  <span
-                    aria-hidden
-                    title="Retry arrives with the pipeline"
-                    className="hidden items-center gap-1 text-[11.5px] font-semibold text-error-text/50 lg:inline-flex"
+                  <Link
+                    href={`/meetings/${meeting.id}/processing`}
+                    className="hidden rounded-sm text-[11.5px] font-semibold text-error-text outline-none hover:underline focus-visible:shadow-focus lg:inline-flex"
                   >
-                    <RotateCcwIcon className="size-3" /> Retry
-                  </span>
+                    Retry
+                  </Link>
                 )}
               </span>
             </TableCell>

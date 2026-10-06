@@ -4,13 +4,10 @@ import { isAPIError } from "better-auth/api";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { actionError, type ActionResult } from "@/lib/action-result";
-import { DEMO_UNAVAILABLE_MESSAGE, resolveDemoCredentials } from "@/lib/demo-account";
 import { signInSchema, signUpSchema } from "@/lib/validation/auth";
 
 /**
- * Auth mutations. Everything here runs server-side only, which is what keeps
- * the demo credentials out of the browser bundle — the client calls
- * `signInAsDemo()` with no arguments and never learns the email or password.
+ * Auth mutations. Everything here runs server-side only.
  *
  * These return an ActionResult rather than redirecting, so the form can show
  * an inline message. Navigation happens on the client after `ok: true`.
@@ -53,33 +50,6 @@ export async function signUp(input: unknown): Promise<ActionResult> {
     return { ok: true };
   } catch (error) {
     return authError(error, "We couldn't create your account. Try again.");
-  }
-}
-
-/**
- * Sign in to the shared demo account. The credentials are read from the
- * server environment at call time; nothing is accepted from the caller.
- */
-export async function signInAsDemo(): Promise<ActionResult> {
-  const resolved = resolveDemoCredentials(process.env);
-  if (!resolved.ok) {
-    // The reason names env vars, so it goes to the server log, not the browser.
-    console.warn(`[demo] unavailable: ${resolved.reason}`);
-    return actionError(DEMO_UNAVAILABLE_MESSAGE);
-  }
-
-  try {
-    await auth.api.signInEmail({
-      body: {
-        email: resolved.credentials.email,
-        password: resolved.credentials.password,
-      },
-      headers: await headers(),
-    });
-    return { ok: true };
-  } catch (error) {
-    console.warn("[demo] sign-in failed — has `npm run seed:demo` been run?", error);
-    return actionError("The demo account isn't ready yet. Try again in a moment.");
   }
 }
 

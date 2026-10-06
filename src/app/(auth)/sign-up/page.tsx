@@ -3,8 +3,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Brand } from "@/components/brand";
 import { getSession } from "@/lib/session";
-import { DemoButton } from "@/components/demo-button";
-import { Divider } from "../_components/divider";
 import { SignUpForm } from "../_components/sign-up-form";
 
 export const metadata: Metadata = {
@@ -26,11 +24,7 @@ export default async function SignUpPage() {
         <p className="mt-1.5 text-base text-slate">Get cited recaps of your own meetings.</p>
       </div>
 
-      <div className="flex flex-col gap-3.5">
-        <SignUpForm />
-        <Divider>or</Divider>
-        <DemoButton />
-      </div>
+      <SignUpForm />
 
       <p className="text-sm text-slate">
         Already have an account?{" "}

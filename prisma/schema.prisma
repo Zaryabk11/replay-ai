@@ -10,9 +10,20 @@ datasource db {
   provider = "postgresql"
 }
 
+/// Triage state for a proposed action item.
+enum ActionItemStatus {
+  PROPOSED
+  ACCEPTED
+  DISMISSED
+}
+
+/// Pipeline stages, in order. The UI renders them as a checklist, so the
+/// order here is the order shown.
 enum MeetingStatus {
-  PENDING
-  PROCESSING
+  UPLOADED
+  TRANSCRIBING
+  SUMMARIZING
+  VALIDATING
   READY
   FAILED
 }
@@ -33,34 +44,90 @@ model User {
 }
 
 model Meeting {
-  id          String              @id @default(cuid())
+  id          String        @id @default(cuid())
   userId      String
-  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   title       String
-  status      MeetingStatus       @default(PENDING)
-  audioUrl    String?
-  durationSec Int?
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+  status      MeetingStatus @default(UPLOADED)
+
+  // Vercel Blob. pathname is kept so the object can be deleted later.
+  audioUrl     String?
+  blobPathname String?
+  sizeBytes    Int?
+  contentType  String?
+  durationSec  Int?
+
+  // Deepgram. The raw payload lands here from the webhook, then the pipeline
+  // maps it; keeping it off the Inngest event avoids the event size limit.
+  transcriptionRequestId String?
+  transcriptRaw          Json?
+
+  // The summary's own prose. Points and action items hang off it.
+  summaryHeadline String?
+  summaryOverview String?
+
+  /// Citations the validator could not point at a real segment.
+  droppedCitations Int @default(0)
+
+  /// Set together when status is FAILED, and cleared on a retry.
+  failureStage  String?
+  failureReason String?
+  retryCount    Int     @default(0)
+
+  processingStartedAt DateTime?
+  readyAt             DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
   segments    TranscriptSegment[]
   points      SummaryPoint[]
   actionItems ActionItem[]
+  speakers    Speaker[]
 
-  @@index([userId])
+  @@index([userId, createdAt])
+  @@index([transcriptionRequestId])
+}
+
+/// One diarized voice in a meeting, so a rename is a single row rather than an
+/// update across every segment — and the original label survives it, which is
+/// what keeps the colour stable.
+model Speaker {
+  id        String  @id @default(cuid())
+  meetingId String
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  /// The provider's label, e.g. "Speaker 1". Matches TranscriptSegment.speaker.
+  key String
+  /// What the user renamed it to. Null means show the key.
+  label String?
+
+  /// 0-based, assigned in first-appearance order. Picks the colour.
+  order Int
+
+  @@unique([meetingId, key])
+  @@index([meetingId])
 }
 
 model TranscriptSegment {
   id        String  @id @default(cuid())
   meetingId String
   meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  speaker   String?
-  text      String
-  startMs   Int
-  endMs     Int
 
+  /// 0-based position. This is what the model cites, so it must be stable.
+  index   Int
+  speaker String?
+  text    String
+  startMs Int
+  endMs   Int
+
+  citedBy       SummaryPoint[]
+  citedByAction ActionItem[]
+
+  @@unique([meetingId, index])
   @@index([meetingId, startMs])
 }
 
+/// A takeaway, with the transcript moment it came from.
 model SummaryPoint {
   id        String  @id @default(cuid())
   meetingId String
@@ -68,7 +135,12 @@ model SummaryPoint {
   text      String
   position  Int
 
+  /// Null when the validator dropped an unusable citation but kept the point.
+  segmentId String?
+  segment   TranscriptSegment? @relation(fields: [segmentId], references: [id], onDelete: SetNull)
+
   @@index([meetingId])
+  @@index([segmentId])
 }
 
 model ActionItem {
@@ -78,9 +150,18 @@ model ActionItem {
   text      String
   assignee  String?
   dueDate   DateTime?
-  done      Boolean   @default(false)
+  position  Int       @default(0)
+
+  status      ActionItemStatus @default(PROPOSED)
+  dismissedAt DateTime?
+  /// Set when a person edits the text, so the UI can say it was changed.
+  editedAt DateTime?
+
+  segmentId String?
+  segment   TranscriptSegment? @relation(fields: [segmentId], references: [id], onDelete: SetNull)
 
   @@index([meetingId])
+  @@index([segmentId])
 }
 
 model Session {

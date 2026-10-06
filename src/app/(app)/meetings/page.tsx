@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { Button } from "@/components/ui/button";
@@ -22,9 +23,7 @@ export default function MeetingsPage() {
       title="Meeting Library"
       description="Browse, search and review your meeting transcripts."
       action={
-        <Button disabled title="Upload arrives in the next step">
-          Upload recording
-        </Button>
+        <Button render={<Link href="/meetings/upload" />}>Upload recording</Button>
       }
     >
       {/* Streams in, so the header paints before the query finishes. The

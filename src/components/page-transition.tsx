@@ -23,7 +23,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={fadeUpTransition}
-        className="flex min-h-full flex-1 flex-col"
+        className="flex min-h-0 flex-1 flex-col"
       >
         {children}
       </motion.div>

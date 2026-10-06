@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthIllustration } from "@/components/auth-illustration";
 import { Brand } from "@/components/brand";
-import { DemoButton } from "@/components/demo-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/session";
@@ -37,7 +36,9 @@ export default async function HomePage() {
             <Button variant="ghost" size="sm" render={<Link href="/sign-in" />}>
               Sign in
             </Button>
-            <DemoButton label="Try the demo" variant="default" size="sm" fullWidth={false} />
+            <Button size="sm" render={<Link href="/sign-up" />}>
+              Create account
+            </Button>
           </div>
         )}
       </header>
@@ -59,7 +60,9 @@ export default async function HomePage() {
               </Button>
             ) : (
               <>
-                <DemoButton label="Try the demo" variant="default" fullWidth={false} />
+                <Button size="lg" render={<Link href="/sign-up" />}>
+                  Create account
+                </Button>
                 <Button variant="secondary" size="lg" render={<Link href="/sign-in" />}>
                   Sign in
                 </Button>
@@ -86,15 +89,7 @@ export default async function HomePage() {
         </section>
       </main>
 
-      <footer className="flex flex-wrap items-center justify-between gap-2.5 border-t border-line-200 px-5 py-5 font-mono text-[11px] text-slate-400 sm:px-7">
-        <span>RECAP · AI MEETING REVIEWER</span>
-        <Link
-          href="/design"
-          className="rounded-sm outline-none hover:text-slate focus-visible:shadow-focus"
-        >
-          Design system
-        </Link>
-      </footer>
+      
     </div>
   );
 }

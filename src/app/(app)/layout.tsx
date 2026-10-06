@@ -13,7 +13,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { user } = await requireSession();
 
   return (
-    <div className="flex min-h-dvh flex-col md:flex-row">
+    <div className="flex h-dvh flex-col overflow-hidden md:flex-row">
       <aside className="hidden w-50 shrink-0 flex-col gap-1 bg-deep-teal-500 px-3.5 py-4.5 md:flex">
         <div className="px-2 pb-4">
           <Brand size="sm" tone="onTeal" href="/meetings" />
@@ -31,8 +31,8 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         <span className="text-xs text-white/72">{user.name}</span>
       </header>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <main className="flex flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
           <PageTransition>{children}</PageTransition>
         </main>
         <MobileNav />

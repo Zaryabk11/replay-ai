@@ -41,6 +41,43 @@ is imported outside that folder.
 We are **not** using Groq or the Claude API. Free tiers only; do not add a
 provider that needs a paid plan without asking first.
 
+Both are called over `fetch`, not their SDKs: each uses one or two endpoints,
+and the mapping is where the logic lives. The mappers (`parseDeepgramResult`,
+`parseGeminiResult`) are pure and fixture-tested.
+
+A transcript longer than `CHUNK_SIZE` (400) segments is map-reduced rather
+than truncated: each chunk is summarized on its own, then a final call merges
+the per-chunk results — seeing only their candidate points/action items and
+citations, never the raw transcript — into one summary. A short meeting still
+costs exactly one call. A 429 mid-summary is retried locally with backoff
+(`src/lib/providers/gemini.ts`, `callGemini`) rather than failing the whole
+Inngest step, which would redo every chunk already paid for; a wait past
+`LOCAL_RETRY_CAP_MS` is handed to Inngest's own retry instead.
+
+### Pipeline
+
+`src/inngest/functions/process-meeting.ts` runs transcribe → summarize →
+validate → save, one `step.run` each so a retry resumes rather than repeating
+a metered call. Deepgram gets a callback URL and the pipeline parks on
+`step.waitForEvent`, so no function is held open for the length of a meeting.
+Set `DEEPGRAM_MODE=sync` to await the request inline for local testing.
+
+### Meeting page
+
+Playback state lives in `src/stores/player-store.ts`. Nothing but
+`audio-player.tsx` touches the `<audio>` element — a citation chip records a
+seek and the player performs it, so the transcript and summary need no refs.
+The transcript is virtualized and subscribes to the *derived* active index
+rather than `currentMs`, so it re-renders once per spoken line instead of four
+times a second.
+
+Speakers are a table. Segments store the provider's key ("Speaker 1"), so a
+rename writes one row, every occurrence follows, and the colour stays put.
+
+Every citation is checked against a real segment before it is stored
+(`src/lib/pipeline/citations.ts`). A citation that cannot be resolved is
+dropped and counted; the takeaway is kept uncited rather than discarded.
+
 ## Design system
 
 `src/design/Recap System v2.dc.html` is the source of truth for every visual
@@ -65,6 +102,10 @@ decision. Do not invent colors, radii, shadows, or type sizes beyond it.
   not thrown errors, so forms can render a message.
 - Secrets stay server-side. Only `NEXT_PUBLIC_*` reaches the browser; the demo
   credentials in particular must never be imported into a client component.
+- There is **no demo sign-in**. The seeded demo account still exists (see
+  `seed:demo`) and still gets the tighter upload budget via `isDemoEmail`, but
+  the "Try the demo" button and its server action were removed — do not add a
+  UI path into that account without being asked.
 
 ## Commands
 
@@ -76,7 +117,9 @@ decision. Do not invent colors, radii, shadows, or type sizes beyond it.
 | `npm run lint`        | eslint                                            |
 | `npm run db:migrate`  | Prisma migration against Neon (uses `DIRECT_URL`) |
 | `npm run db:generate` | Regenerate the client — Prisma 7 does not do this on migrate |
-| `npm run seed:demo`   | Create/update the demo account + placeholder meetings |
+| `npm run seed:demo`   | Create/update the demo account + placeholder meetings (no UI signs into it) |
+| `npm run seed:sample` | One READY meeting with a fake transcript, for the meeting page (pass a segment count, e.g. `npm run seed:sample 4000`) |
+| `npx inngest-cli@latest dev` | Inngest dev server (run beside `npm run dev`)   |
 
 Environment lives in `.env.local` (gitignored). `.env.example` lists every
 variable with no values.

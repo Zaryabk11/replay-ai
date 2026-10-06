@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { LayoutGridIcon, RotateCcwIcon, TriangleAlertIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -44,7 +45,7 @@ export function LibraryEmpty() {
       <p className="max-w-50 text-[12.5px] leading-normal text-slate-400">
         Upload your first recording to get a cited recap.
       </p>
-      <Button className="mt-1" disabled title="Upload arrives in the next step">
+      <Button className="mt-1" render={<Link href="/meetings/upload" />}>
         Upload recording
       </Button>
     </div>

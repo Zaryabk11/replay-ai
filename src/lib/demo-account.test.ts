@@ -85,7 +85,7 @@ describe("isDemoEmail", () => {
 
 describe("demoMeetingSeeds", () => {
   it("covers the three states the library needs to show", () => {
-    expect(demoMeetingSeeds.map((m) => m.status)).toEqual(["READY", "PROCESSING", "FAILED"]);
+    expect(demoMeetingSeeds.map((m) => m.status)).toEqual(["READY", "TRANSCRIBING", "FAILED"]);
   });
 
   it("marks every seeded meeting as a placeholder", () => {
