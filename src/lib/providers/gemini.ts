@@ -455,18 +455,18 @@ export const gemini: SummaryProvider = {
       return callGemini(buildPrompt(segments));
     }
 
-    // Map: summarize each chunk on its own, sequentially. Sequential rather
-    // than parallel so a free-tier per-minute limit is hit at most once per
-    // call rather than all at once.
-    const parts: DraftSummary[] = [];
-    for (let i = 0; i < chunks.length; i++) {
-      parts.push(
-        await callGemini(buildChunkPrompt(chunks[i], i + 1, chunks.length), {
+    // Map: summarize each chunk on its own, in parallel. Each call already
+    // retries locally on 429/503 (see callGemini), so firing them together
+    // trades a slightly higher chance of all of them hitting a rate limit at
+    // once for finishing in one round trip instead of `chunks.length`.
+    const parts: DraftSummary[] = await Promise.all(
+      chunks.map((chunk, i) =>
+        callGemini(buildChunkPrompt(chunk, i + 1, chunks.length), {
           points: CHUNK_MAX_POINTS,
           actionItems: CHUNK_MAX_ACTION_ITEMS,
         })
-      );
-    }
+      )
+    );
 
     // Reduce: merge the candidates into one meeting-level summary.
     return callGemini(buildReducePrompt(parts));
