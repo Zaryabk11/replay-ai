@@ -380,20 +380,30 @@ async function requestGemini(prompt: string): Promise<unknown> {
 
   if (!response.ok) {
     const body = await response.text().catch(() => "");
+    const message = geminiErrorMessage(body);
 
     if (response.status === 429) {
       throw new ProviderRateLimitError(
-        "Gemini free-tier rate limit reached.",
+        `Gemini free-tier rate limit reached. ${message}`,
+        retryAfterFrom(response, body)
+      );
+    }
+    // 503 is Gemini's shared-capacity signal ("model is currently experiencing
+    // high demand") — temporary like a rate limit, not a bad request, so it
+    // gets the same local-backoff-then-Inngest-retry treatment as 429.
+    if (response.status === 503) {
+      throw new ProviderRateLimitError(
+        `Gemini is temporarily overloaded. ${message}`,
         retryAfterFrom(response, body)
       );
     }
     if (response.status === 400 || response.status === 403) {
       throw new ProviderFatalError(
-        `Gemini rejected the request (${response.status}). ${body.slice(0, 200)}`,
+        `Gemini rejected the request (${response.status}). ${message}`,
         "SUMMARIZING"
       );
     }
-    throw new Error(`Gemini returned ${response.status}. ${body.slice(0, 200)}`);
+    throw new Error(`Gemini returned ${response.status}. ${message}`);
   }
 
   return response.json();
@@ -462,6 +472,21 @@ export const gemini: SummaryProvider = {
     return callGemini(buildReducePrompt(parts));
   },
 };
+
+/**
+ * Gemini's error body is `{ error: { message, ... } }`. Pulling the inner
+ * message out is what lets a failed meeting show "This model is currently
+ * experiencing high demand..." instead of the whole JSON envelope.
+ */
+export function geminiErrorMessage(body: string): string {
+  try {
+    const parsed = JSON.parse(body) as { error?: { message?: unknown } };
+    if (typeof parsed.error?.message === "string") return parsed.error.message;
+  } catch {
+    // Not JSON — fall through to the raw body.
+  }
+  return body.slice(0, 200) || "No further detail was returned.";
+}
 
 /**
  * Gemini returns a RetryInfo block on 429 rather than a Retry-After header.

@@ -56,20 +56,39 @@ export const processMeeting = inngest.createFunction(
 
     if (!meeting) return { meetingId, skipped: "already ready" };
 
-    await step.run("mark-transcribing", async () => {
-      await db.meeting.update({
-        where: { id: meetingId },
-        data: {
-          status: "TRANSCRIBING",
-          processingStartedAt: new Date(),
-          failureStage: null,
-          failureReason: null,
-        },
+    // -- 1. Transcribe --------------------------------------------------
+    // A retry after transcription already succeeded (summarize, validate, or
+    // save failed) resumes from the segments already stored instead of
+    // paying for Deepgram again — this is what makes retrying a long
+    // recording after a transient Gemini error fast instead of starting over.
+    const storedSegments: Segment[] = await step.run("load-stored-segments", async () => {
+      const rows = await db.transcriptSegment.findMany({
+        where: { meetingId },
+        orderBy: { index: "asc" },
+        select: { index: true, speaker: true, text: true, startMs: true, endMs: true },
       });
+      // Always written non-null by storeSegments; the column is only nullable
+      // because Prisma's generated type can't express "never in practice."
+      return rows.map((row) => ({ ...row, speaker: row.speaker ?? "Speaker" }));
     });
 
-    // -- 1. Transcribe ------------------------------------------------------
-    const segments = await transcribe(step, meetingId, meeting.audioUrl);
+    const segments: Segment[] =
+      storedSegments.length > 0
+        ? storedSegments
+        : await (async () => {
+            await step.run("mark-transcribing", async () => {
+              await db.meeting.update({
+                where: { id: meetingId },
+                data: {
+                  status: "TRANSCRIBING",
+                  processingStartedAt: new Date(),
+                  failureStage: null,
+                  failureReason: null,
+                },
+              });
+            });
+            return transcribe(step, meetingId, meeting.audioUrl);
+          })();
 
     if (segments.length === 0) {
       throw new NonRetriableError("No speech was found in that recording.");
