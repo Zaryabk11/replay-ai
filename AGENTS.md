@@ -36,7 +36,7 @@ Both sit behind the provider interface in `src/lib/providers/`, so neither SDK
 is imported outside that folder.
 
 - **Transcription — Deepgram**, with speaker diarization. `DEEPGRAM_API_KEY`.
-- **Summaries — Gemini 3.8 Flash**. `GEMINI_API_KEY`.
+- **Summaries — Gemini Flash-Lite**. `GEMINI_API_KEY`.
 
 We are **not** using Groq or the Claude API. Free tiers only; do not add a
 provider that needs a paid plan without asking first.

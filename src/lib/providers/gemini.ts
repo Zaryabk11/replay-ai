@@ -8,7 +8,12 @@ import {
 } from "./types";
 
 /**
- * Summaries from Gemini 3.8 Flash, constrained to JSON by `responseSchema`.
+ * Summaries from Gemini Flash-Lite, constrained to JSON by `responseSchema`.
+ *
+ * Deliberately the lite line, not the flagship Flash model: the free tier
+ * caps `gemini-3.8-flash` at 20 requests *per day, total* — one meeting can
+ * burn that in a single map-reduce summary. The lite line's free quota is
+ * far higher and the model handles this schema just as well.
  *
  * Reached over fetch: one endpoint, and the schema below has to be hand-built
  * for Gemini's dialect anyway, so the SDK would not save anything.
@@ -22,7 +27,7 @@ import {
  * case) still takes exactly one call, unchanged from before.
  */
 
-const MODEL = process.env.GEMINI_MODEL ?? "gemini-3.8-flash";
+const MODEL = process.env.GEMINI_MODEL ?? "gemini-3.5-flash-lite";
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
 /** Final caps on the merged summary — a product decision, not a technical one. */
@@ -372,8 +377,8 @@ async function requestGemini(prompt: string): Promise<unknown> {
         // Summaries should be reproducible, not creative.
         temperature: 0.2,
         maxOutputTokens: 2048,
-        // Thinking burns free-tier tokens for no gain on a task this shaped.
-        thinkingConfig: { thinkingBudget: 0 },
+        // No thinkingConfig: the lite line doesn't support it (400s on it),
+        // and doesn't do hidden "thinking" that would need disabling anyway.
       },
     }),
   });
@@ -436,7 +441,7 @@ async function callGemini(prompt: string, caps?: ResultCaps): Promise<DraftSumma
 // ---------------------------------------------------------------------------
 
 export const gemini: SummaryProvider = {
-  name: "gemini-3.8-flash",
+  name: "gemini-3.5-flash-lite",
 
   async summarize({ segments }) {
     if (!process.env.GEMINI_API_KEY) {
