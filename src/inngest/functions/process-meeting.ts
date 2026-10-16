@@ -133,6 +133,18 @@ export const processMeeting = inngest.createFunction(
       const segmentId = (index: number | null) =>
         index === null ? null : (idByIndex.get(index) ?? null);
 
+      const [speakerCount, meetingRow] = await Promise.all([
+        db.speaker.count({ where: { meetingId } }),
+        db.meeting.findUnique({ where: { id: meetingId }, select: { processingStartedAt: true } }),
+      ]);
+      const readyAt = new Date();
+      const processingDurationMs = meetingRow?.processingStartedAt
+        ? readyAt.getTime() - meetingRow.processingStartedAt.getTime()
+        : null;
+      const citationsProposed = validated.points.length + validated.actionItems.length;
+      const citationsDropped = validated.dropped;
+      const citationsValidated = citationsProposed - citationsDropped;
+
       await db.$transaction([
         db.summaryPoint.deleteMany({ where: { meetingId } }),
         db.actionItem.deleteMany({ where: { meetingId } }),
@@ -157,10 +169,15 @@ export const processMeeting = inngest.createFunction(
           where: { id: meetingId },
           data: {
             status: "READY",
-            readyAt: new Date(),
+            readyAt,
             summaryHeadline: draft.headline,
             summaryOverview: draft.overview,
             droppedCitations: validated.dropped,
+            processingDurationMs,
+            speakerCount,
+            citationsProposed,
+            citationsValidated,
+            citationsDropped,
             failureStage: null,
             failureReason: null,
           },

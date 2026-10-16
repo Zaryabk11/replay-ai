@@ -27,3 +27,27 @@ export function formatMeetingDate(date: Date): string {
 export function formatMeetingTime(date: Date): string {
   return new Intl.DateTimeFormat(LOCALE, { hour: "numeric", minute: "2-digit" }).format(date);
 }
+
+/** Milliseconds to `3:42`, reusing the same m:ss shape as `formatDuration`. */
+export function formatDurationMs(ms: number | null | undefined): string {
+  if (ms == null || !Number.isFinite(ms) || ms < 0) return "—";
+  return formatDuration(ms / 1000);
+}
+
+/** A 0-100 ratio to `96%`, or `—` when there is nothing to divide. */
+export function formatPercent(ratio: number | null | undefined): string {
+  if (ratio == null || !Number.isFinite(ratio)) return "—";
+  return `${Math.round(ratio * 100)}%`;
+}
+
+/** `citationsValidated / citationsProposed` as a 0-1 ratio, or null with no citations. */
+export function citationAccuracy(proposed: number, validated: number): number | null {
+  if (proposed <= 0) return null;
+  return validated / proposed;
+}
+
+/** A float average to one decimal, e.g. `3.2`, or `—` with nothing to average. */
+export function formatAverage(value: number | null | undefined, decimals = 1): string {
+  if (value == null || !Number.isFinite(value)) return "—";
+  return value.toFixed(decimals);
+}

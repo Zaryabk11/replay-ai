@@ -5,7 +5,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { CheckIcon, RotateCcwIcon, TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { fadeUpTransition, layoutShiftTransition } from "@/lib/motion";
@@ -54,6 +55,23 @@ export function ProcessingView({ initial }: { initial: MeetingProgress }) {
       query.state.data && shouldStopPolling(query.state.data.status) ? false : POLL_MS,
     refetchOnWindowFocus: true,
   });
+
+  // Toast only on an observed transition, not on a page load that already
+  // finds the meeting READY or FAILED — polling stops once it does, so this
+  // fires at most once per terminal state.
+  const prevStatusRef = useRef(initial.status);
+  useEffect(() => {
+    if (data.status === prevStatusRef.current) return;
+    prevStatusRef.current = data.status;
+
+    if (data.status === "READY") {
+      toast.success("Recap ready", {
+        action: { label: "Open", onClick: () => router.push(`/meetings/${initial.id}`) },
+      });
+    } else if (data.status === "FAILED") {
+      toast.error("Processing failed", { description: data.failureReason ?? undefined });
+    }
+  }, [data.status, data.failureReason, initial.id, router]);
 
   const states = stageStates(data.status, data.failureStage as PipelineStage | null);
 

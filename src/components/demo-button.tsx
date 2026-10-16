@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { signInAsDemo } from "@/app/(auth)/actions";
 
@@ -37,6 +38,7 @@ export function DemoButton({
         setError(result.message);
         return;
       }
+      toast.success("Signed in to the demo account");
       router.replace(redirectTo);
       router.refresh();
     });

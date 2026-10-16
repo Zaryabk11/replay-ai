@@ -3,6 +3,7 @@
 import { LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { toast } from "sonner";
 import { signOut } from "@/app/(auth)/actions";
 
 /** Avatar, name and sign-out at the foot of the teal sidebar. */
@@ -20,7 +21,12 @@ export function UserFooter({
 
   function leave() {
     startTransition(async () => {
-      await signOut();
+      const result = await signOut();
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
+      toast.success("Signed out");
       router.replace("/sign-in");
       router.refresh();
     });

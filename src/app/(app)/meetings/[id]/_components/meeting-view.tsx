@@ -11,6 +11,7 @@ import { usePlayerStore } from "@/stores/player-store";
 import { ActionItems, type ActionItemView } from "./action-items";
 import { AudioPlayer } from "./audio-player";
 import { ExportButton } from "./export-button";
+import { ShareDialog } from "./share-dialog";
 import { SpeakerList } from "./speaker-list";
 import { SummaryPanel, type SummaryPointView } from "./summary-panel";
 import { Transcript, type TranscriptSegmentView } from "./transcript";
@@ -24,6 +25,8 @@ export type MeetingView = {
   summaryHeadline: string | null;
   summaryOverview: string | null;
   droppedCitations: number;
+  shareEnabled: boolean;
+  shareUrl: string | null;
   speakers: SpeakerRecord[];
   segments: TranscriptSegmentView[];
   points: SummaryPointView[];
@@ -94,19 +97,26 @@ export function MeetingViewer({ initial }: { initial: MeetingView }) {
           <h1 className="truncate font-serif text-xl font-medium text-ink">{initial.title}</h1>
           <p className="mt-0.5 text-xs text-slate-400">{meta}</p>
         </div>
-        <ExportButton
-          input={{
-            meeting: {
-              title: initial.title,
-              createdAt: new Date(initial.createdAt),
-              durationSec: initial.durationSec,
-              summaryHeadline: initial.summaryHeadline,
-              summaryOverview: initial.summaryOverview,
-            },
-            points: initial.points,
-            actionItems,
-          }}
-        />
+        <div className="flex items-center gap-2">
+          <ShareDialog
+            meetingId={initial.id}
+            initialEnabled={initial.shareEnabled}
+            initialUrl={initial.shareUrl}
+          />
+          <ExportButton
+            input={{
+              meeting: {
+                title: initial.title,
+                createdAt: new Date(initial.createdAt),
+                durationSec: initial.durationSec,
+                summaryHeadline: initial.summaryHeadline,
+                summaryOverview: initial.summaryOverview,
+              },
+              points: initial.points,
+              actionItems,
+            }}
+          />
+        </div>
       </header>
 
       {initial.speakers.length > 0 && (

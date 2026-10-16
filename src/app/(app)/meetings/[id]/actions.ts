@@ -5,6 +5,7 @@ import { actionError, type ActionResult } from "@/lib/action-result";
 import { canApply, nextStatus, validateEdit, type ActionItemAction } from "@/lib/action-items";
 import { db } from "@/lib/db";
 import { requireSession } from "@/lib/session";
+import { generateShareToken, shareUrlFor } from "@/lib/share-token";
 import { validateSpeakerName } from "@/lib/speakers";
 
 /**
@@ -111,4 +112,57 @@ export async function updateActionItem(input: {
 
   revalidatePath(`/meetings/${meetingId}`);
   return { ok: true, data: { status } };
+}
+
+// ---------------------------------------------------------------------------
+// Public sharing
+// ---------------------------------------------------------------------------
+
+/**
+ * Turn on public sharing. Reuses the existing token if one is already on the
+ * row — enabling twice, or disabling and re-enabling via a stale `shareToken`
+ * left by a bug, shouldn't mint a new link — and mints one the first time.
+ *
+ * Only a READY meeting has a transcript and summary to show, so that's the
+ * same gate the public page itself applies.
+ */
+export async function enableSharing(meetingId: unknown): Promise<ActionResult<{ url: string }>> {
+  if (typeof meetingId !== "string" || !meetingId) return actionError("Unknown meeting.");
+
+  const { user } = await requireSession();
+  const meeting = await db.meeting.findFirst({
+    where: { id: meetingId, userId: user.id },
+    select: { status: true, shareToken: true },
+  });
+  if (!meeting) return actionError("That meeting no longer exists.");
+  if (meeting.status !== "READY") return actionError("This meeting isn't ready to share yet.");
+
+  const token = meeting.shareToken ?? generateShareToken();
+
+  await db.meeting.update({
+    where: { id: meetingId },
+    data: { shareToken: token, shareEnabled: true },
+  });
+
+  revalidatePath(`/meetings/${meetingId}`);
+  return { ok: true, data: { url: shareUrlFor(token) } };
+}
+
+/**
+ * Turn off public sharing and clear the token, not just the flag. The usual
+ * reason to revoke is "that link shouldn't work anymore" — keeping the token
+ * around would let re-enabling resurrect the exact link someone meant to
+ * kill, so re-enabling after a revoke always mints a fresh one.
+ */
+export async function revokeSharing(meetingId: unknown): Promise<ActionResult> {
+  if (typeof meetingId !== "string" || !meetingId) return actionError("Unknown meeting.");
+  if (!(await ownedMeeting(meetingId))) return actionError("That meeting no longer exists.");
+
+  await db.meeting.update({
+    where: { id: meetingId },
+    data: { shareEnabled: false, shareToken: null },
+  });
+
+  revalidatePath(`/meetings/${meetingId}`);
+  return { ok: true };
 }

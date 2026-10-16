@@ -44,11 +44,11 @@ model User {
 }
 
 model Meeting {
-  id          String        @id @default(cuid())
-  userId      String
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title       String
-  status      MeetingStatus @default(UPLOADED)
+  id     String        @id @default(cuid())
+  userId String
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title  String
+  status MeetingStatus @default(UPLOADED)
 
   // Vercel Blob. pathname is kept so the object can be deleted later.
   audioUrl     String?
@@ -74,10 +74,26 @@ model Meeting {
   failureReason String?
   retryCount    Int     @default(0)
 
-  processingStartedAt DateTime?
-  readyAt             DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  processingStartedAt  DateTime?
+  readyAt              DateTime?
+  /// readyAt - processingStartedAt, persisted so it survives without
+  /// recomputing from the two timestamps.
+  processingDurationMs Int?
+  /// Distinct Speaker rows at the time the meeting reached READY.
+  speakerCount         Int?
+  /// Citation counts from the validate-citations step, persisted alongside
+  /// droppedCitations rather than replacing it.
+  citationsProposed    Int       @default(0)
+  citationsValidated   Int       @default(0)
+  citationsDropped     Int       @default(0)
+
+  /// Set once sharing is first enabled, cleared again on revoke — a revoked
+  /// link never comes back to life, since re-enabling mints a fresh token.
+  shareToken   String? @unique
+  shareEnabled Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   segments    TranscriptSegment[]
   points      SummaryPoint[]
@@ -97,7 +113,7 @@ model Speaker {
   meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 
   /// The provider's label, e.g. "Speaker 1". Matches TranscriptSegment.speaker.
-  key String
+  key   String
   /// What the user renamed it to. Null means show the key.
   label String?
 
@@ -155,7 +171,7 @@ model ActionItem {
   status      ActionItemStatus @default(PROPOSED)
   dismissedAt DateTime?
   /// Set when a person edits the text, so the UI can say it was changed.
-  editedAt DateTime?
+  editedAt    DateTime?
 
   segmentId String?
   segment   TranscriptSegment? @relation(fields: [segmentId], references: [id], onDelete: SetNull)

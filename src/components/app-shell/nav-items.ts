@@ -1,11 +1,19 @@
-import { CircleCheckIcon, LayoutGridIcon, SearchIcon, SettingsIcon } from "lucide-react";
+import {
+  BarChart3Icon,
+  CircleCheckIcon,
+  LayoutGridIcon,
+  SearchIcon,
+  SettingsIcon,
+} from "lucide-react";
 
 /**
  * The trimmed sidebar from the design file: Meetings, Search, Action Items,
- * Settings. Nothing else goes here without a design change.
+ * Settings, plus Insights for the cross-meeting metrics dashboard. Nothing
+ * else goes here without a design change.
  */
 export const navItems = [
   { href: "/meetings", label: "Meetings", short: "Meetings", icon: LayoutGridIcon },
+  { href: "/insights", label: "Insights", short: "Insights", icon: BarChart3Icon },
   { href: "/search", label: "Search", short: "Search", icon: SearchIcon },
   { href: "/action-items", label: "Action Items", short: "Actions", icon: CircleCheckIcon },
   { href: "/settings", label: "Settings", short: "Settings", icon: SettingsIcon },

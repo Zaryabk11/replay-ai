@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { MIN_PASSWORD_LENGTH, signUpSchema, type SignUpInput } from "@/lib/validation/auth";
 import { signUp } from "../actions";
@@ -34,6 +35,7 @@ export function SignUpForm({ redirectTo = "/meetings" }: { redirectTo?: string }
       }
       return;
     }
+    toast.success("Account created");
     router.replace(redirectTo);
     router.refresh();
   });

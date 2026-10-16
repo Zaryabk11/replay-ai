@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireSession } from "@/lib/session";
+import { shareUrlFor } from "@/lib/share-token";
 import { MeetingViewer, type MeetingView } from "./_components/meeting-view";
 
 export const dynamic = "force-dynamic";
@@ -34,6 +35,8 @@ export default async function MeetingPage({ params }: PageProps<"/meetings/[id]"
       summaryHeadline: true,
       summaryOverview: true,
       droppedCitations: true,
+      shareEnabled: true,
+      shareToken: true,
       speakers: {
         orderBy: { order: "asc" },
         select: { key: true, label: true, order: true },
@@ -78,6 +81,8 @@ export default async function MeetingPage({ params }: PageProps<"/meetings/[id]"
     summaryHeadline: meeting.summaryHeadline,
     summaryOverview: meeting.summaryOverview,
     droppedCitations: meeting.droppedCitations,
+    shareEnabled: meeting.shareEnabled,
+    shareUrl: meeting.shareToken ? shareUrlFor(meeting.shareToken) : null,
     speakers: meeting.speakers,
     segments: meeting.segments,
     points: meeting.points.map((point) => ({

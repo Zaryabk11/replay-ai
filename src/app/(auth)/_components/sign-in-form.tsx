@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { signInSchema, type SignInInput } from "@/lib/validation/auth";
 import { signIn } from "../actions";
@@ -34,6 +35,7 @@ export function SignInForm({ redirectTo = "/meetings" }: { redirectTo?: string }
       }
       return;
     }
+    toast.success("Signed in");
     router.replace(redirectTo);
     router.refresh();
   });
