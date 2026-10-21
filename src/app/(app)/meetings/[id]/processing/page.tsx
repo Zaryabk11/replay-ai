@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { requireSession } from "@/lib/session";
 import { ProcessingView, type MeetingProgress } from "./_components/processing-view";
 
-export const metadata: Metadata = { title: "Processing · Recap" };
+export const metadata: Metadata = { title: "Processing · Replay" };
 export const dynamic = "force-dynamic";
 
 export default async function ProcessingPage({ params }: PageProps<"/meetings/[id]/processing">) {

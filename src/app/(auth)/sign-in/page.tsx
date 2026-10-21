@@ -8,7 +8,7 @@ import { Divider } from "../_components/divider";
 import { SignInForm } from "../_components/sign-in-form";
 
 export const metadata: Metadata = {
-  title: "Sign in · Recap",
+  title: "Sign in · Replay",
   description: "Review your cited meetings.",
 };
 

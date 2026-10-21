@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Recap — every meeting, cited back to the moment it happened",
+  title: "Replay — every meeting, cited back to the moment it happened",
   description:
-    "Upload a recording. Recap returns a cited transcript, a cited summary, and triaged action items — each one linked to the exact timestamp in the recording.",
+    "Upload a recording. Replay returns a cited transcript, a cited summary, and triaged action items — each one linked to the exact timestamp in the recording.",
 };
 
 /** Copy describes only what ships. Nothing here promises a feature we lack. */
@@ -43,7 +43,7 @@ export default async function HomePage() {
             Every meeting, cited back to the moment it happened.
           </h1>
           <p className="max-w-135 text-base leading-relaxed text-slate">
-            Upload a recording. Recap returns a cited transcript, a cited summary, and triaged
+            Upload a recording. Replay returns a cited transcript, a cited summary, and triaged
             action items — each one linked to the exact timestamp in the recording.
           </p>
           <div className="mt-1 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
@@ -63,7 +63,7 @@ export default async function HomePage() {
         </section>
 
         <section
-          aria-label="How Recap works"
+          aria-label="How Replay works"
           className="grid grid-cols-1 gap-px border-t border-line-200 bg-line-200 sm:grid-cols-2 lg:grid-cols-4"
         >
           {steps.map((step) => (

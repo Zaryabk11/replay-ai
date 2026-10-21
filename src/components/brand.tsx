@@ -22,17 +22,19 @@ export function Brand({
   size = "md",
   tone = "default",
   href,
+  label = "Replay",
   className,
 }: {
   size?: keyof typeof markSize;
   tone?: "default" | "onTeal";
   href?: string;
+  label?: string;
   className?: string;
 }) {
   const content = (
     <>
       <LogoMark tone={tone} className={markSize[size]} />
-      <span className={cn("font-semibold tracking-tight", wordSize[size])}>Recap</span>
+      <span className={cn("font-semibold tracking-tight", wordSize[size])}>{label}</span>
     </>
   );
 

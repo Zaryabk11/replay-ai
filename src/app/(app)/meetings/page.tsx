@@ -10,7 +10,7 @@ import { LibraryEmpty, LibrarySkeleton } from "./_components/library-states";
 import { MeetingTable, PlaceholderNotice } from "./_components/meeting-table";
 
 export const metadata: Metadata = {
-  title: "Meetings · Recap",
+  title: "Meetings · Replay",
   description: "Browse, search and review your meeting transcripts.",
 };
 

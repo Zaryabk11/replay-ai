@@ -8,7 +8,7 @@ import { InsightsEmpty, InsightsSkeleton } from "./_components/insights-states";
 import { InsightsView } from "./_components/insights-view";
 
 export const metadata: Metadata = {
-  title: "Insights · Recap",
+  title: "Insights · Replay",
   description: "Aggregate stats across every meeting you've processed.",
 };
 

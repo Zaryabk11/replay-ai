@@ -44,7 +44,7 @@ export async function generateMetadata({
   const { token } = await params;
   const meeting = await loadSharedMeeting(token);
   return {
-    title: meeting ? `${meeting.title} · Shared recap · Recap` : "Shared recap · Recap",
+    title: meeting ? `${meeting.title} · Shared recap · Replay` : "Shared recap · Replay",
     // A token-gated link should stay unlisted even though it needs no login.
     robots: { index: false, follow: false },
   };

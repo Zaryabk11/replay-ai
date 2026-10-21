@@ -5,7 +5,7 @@ import { requireSession } from "@/lib/session";
 import { uploadQuotaFor } from "@/lib/upload-quota";
 import { Dropzone } from "./_components/dropzone";
 
-export const metadata: Metadata = { title: "Upload recording · Recap" };
+export const metadata: Metadata = { title: "Upload recording · Replay" };
 export const dynamic = "force-dynamic";
 
 export default async function UploadPage() {

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { ComingSoon } from "@/components/app-shell/coming-soon";
 
-export const metadata: Metadata = { title: "Settings · Recap" };
+export const metadata: Metadata = { title: "Settings · Replay" };
 
 export default function SettingsPage() {
   return (

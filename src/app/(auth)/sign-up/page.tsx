@@ -8,7 +8,7 @@ import { Divider } from "../_components/divider";
 import { SignUpForm } from "../_components/sign-up-form";
 
 export const metadata: Metadata = {
-  title: "Create account · Recap",
+  title: "Create account · Replay",
   description: "Get cited recaps of your own meetings.",
 };
 

@@ -65,7 +65,7 @@ export function ProcessingView({ initial }: { initial: MeetingProgress }) {
     prevStatusRef.current = data.status;
 
     if (data.status === "READY") {
-      toast.success("Recap ready", {
+      toast.success("Replay ready", {
         action: { label: "Open", onClick: () => router.push(`/meetings/${initial.id}`) },
       });
     } else if (data.status === "FAILED") {
@@ -171,7 +171,7 @@ export function ProcessingView({ initial }: { initial: MeetingProgress }) {
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <div className="text-[13.5px] font-semibold text-success-text">Recap ready</div>
+                <div className="text-[13.5px] font-semibold text-success-text">Replay ready</div>
                 <p className="mt-0.75 text-[12.5px] text-slate">
                   {data.counts.segments} transcript segments · {data.counts.points} takeaways ·{" "}
                   {data.counts.actionItems} action items

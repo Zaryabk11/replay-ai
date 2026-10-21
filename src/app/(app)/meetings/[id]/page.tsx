@@ -16,7 +16,7 @@ export async function generateMetadata({
     where: { id, userId: user.id },
     select: { title: true },
   });
-  return { title: meeting ? `${meeting.title} · Recap` : "Meeting · Recap" };
+  return { title: meeting ? `${meeting.title} · Replay` : "Meeting · Replay" };
 }
 
 export default async function MeetingPage({ params }: PageProps<"/meetings/[id]">) {

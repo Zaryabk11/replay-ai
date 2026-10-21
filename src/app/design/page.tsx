@@ -19,7 +19,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DialogDemo, MotionDemo, ToastDemo } from "./_demos"
 
-export const metadata: Metadata = { title: "Design · Recap" }
+export const metadata: Metadata = { title: "Design · Replay" }
 
 const core = [
   { name: "Deep Teal", hex: "#2F5D62", token: "deep-teal-500 · primary", bg: "bg-deep-teal-500" },
@@ -147,7 +147,7 @@ export default function DesignPage() {
             <div className="flex size-7.5 items-center justify-center rounded-lg bg-deep-teal-500 text-base font-bold text-white">
               R
             </div>
-            <span className="text-xl font-semibold tracking-tight">Recap</span>
+            <span className="text-xl font-semibold tracking-tight">Replay</span>
           </div>
           <h1 className="max-w-155 font-serif text-3xl font-medium tracking-tight">
             Design System v2
