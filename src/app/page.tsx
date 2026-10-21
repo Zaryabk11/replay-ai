@@ -28,18 +28,12 @@ export default async function HomePage() {
     <div className="flex min-h-dvh flex-col bg-white">
       <header className="flex items-center justify-between gap-4 border-b border-line-200 px-5 py-4 sm:px-7">
         <Brand size="md" href="/" />
-        {session ? (
-          <Button size="sm" render={<Link href="/meetings" />}>
-            Go to your library
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" render={<Link href={session ? "/meetings" : "/sign-in"} />}>
+            {session ? "Login with your account" : "Sign in"}
           </Button>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" render={<Link href="/sign-in" />}>
-              Sign in
-            </Button>
-            <DemoButton label="Try the demo" variant="default" size="sm" fullWidth={false} />
-          </div>
-        )}
+          <DemoButton label="Try the demo" variant="default" size="sm" fullWidth={false} />
+        </div>
       </header>
 
       <main className="flex flex-1 flex-col">
@@ -53,18 +47,14 @@ export default async function HomePage() {
             action items — each one linked to the exact timestamp in the recording.
           </p>
           <div className="mt-1 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-            {session ? (
-              <Button size="lg" render={<Link href="/meetings" />}>
-                Go to your library
-              </Button>
-            ) : (
-              <>
-                <DemoButton label="Try the demo" variant="default" fullWidth={false} />
-                <Button variant="secondary" size="lg" render={<Link href="/sign-in" />}>
-                  Sign in
-                </Button>
-              </>
-            )}
+            <DemoButton label="Try the demo" variant="default" fullWidth={false} />
+            <Button
+              variant="secondary"
+              size="lg"
+              render={<Link href={session ? "/meetings" : "/sign-in"} />}
+            >
+              {session ? "Login with your account" : "Sign in"}
+            </Button>
           </div>
           {/* Not in the design file's homepage mock, which is a short browser
               frame. At real viewport heights the page needed something between

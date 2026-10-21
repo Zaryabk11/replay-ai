@@ -41,7 +41,7 @@ export type UploadBudget = {
 export const BUDGETS: Record<"demo" | "user", UploadBudget> = {
   // Shared account, so keep it small enough that one visitor cannot spend the
   // day's credit. Roughly a 20-minute recording.
-  demo: { maxBytes: 25 * MB, maxUploads: 3, windowHours: 24 },
+  demo: { maxBytes: 25 * MB, maxUploads: 5, windowHours: 24 },
   user: { maxBytes: 200 * MB, maxUploads: 10, windowHours: 24 },
 };
 

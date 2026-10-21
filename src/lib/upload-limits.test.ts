@@ -128,7 +128,7 @@ describe("checkUploadRate", () => {
 
   it("tells the visitor when the window frees up", () => {
     // Oldest in the window was 20 hours ago, so 4 hours remain of the 24.
-    const uploads = [hoursAgo(20), hoursAgo(2), hoursAgo(1)];
+    const uploads = [hoursAgo(20), ...Array.from({ length: demo.maxUploads - 1 }, () => hoursAgo(1))];
     const result = checkUploadRate(uploads, demo, now);
 
     expect(result.ok).toBe(false);
@@ -139,8 +139,7 @@ describe("checkUploadRate", () => {
   it("reports minutes when the wait is under an hour", () => {
     const uploads = [
       new Date(now.getTime() - (24 * 3600_000 - 30 * 60_000)),
-      hoursAgo(2),
-      hoursAgo(1),
+      ...Array.from({ length: demo.maxUploads - 1 }, () => hoursAgo(1)),
     ];
     const result = checkUploadRate(uploads, demo, now);
     expect(!result.ok && result.message).toMatch(/30 minutes/);
